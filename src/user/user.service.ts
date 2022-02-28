@@ -11,7 +11,7 @@ import { Repository } from 'typeorm';
 import { SignInRequest } from './dto/request/SignIn.request';
 import { TokenResponse } from './dto/response/Token.response';
 import { AuthService } from '../auth/auth.service';
-import { compare, hash } from 'bcrypt';
+import { compare, hash } from 'bcryptjs';
 
 @Injectable()
 export class UserService {
