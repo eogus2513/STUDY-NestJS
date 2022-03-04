@@ -19,7 +19,7 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
         database: configService.get('DB_NAME'),
         entities: [User],
         synchronize: false,
-        logging: true,
+        logging: false,
       }),
     }),
   ],
