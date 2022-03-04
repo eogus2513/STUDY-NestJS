@@ -11,8 +11,8 @@ export class WsJwtGuard implements CanActivate {
   public async canActivate(context: ExecutionContext): Promise<boolean> {
     try {
       const socket: Socket = context.switchToWs().getClient<Socket>();
-      const user: User = await this.authService.verify(
-        socket.handshake.headers.authorization,
+      const user: User = await this.authService.wsVerify(
+        socket.handshake.headers.authroization.toString(),
       );
       context.switchToHttp().getRequest().user = user;
 
