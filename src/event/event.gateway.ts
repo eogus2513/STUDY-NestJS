@@ -26,7 +26,7 @@ export class EventGateway
 
   @WebSocketServer() server: Server;
 
-  private logger = new Logger('SOCKET');
+  private logger = new Logger('socket.io');
 
   @SubscribeMessage('events')
   handleEvent(@MessageBody() data: string): string {
