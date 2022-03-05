@@ -6,6 +6,10 @@ import { httpExceptionFilter } from './common/exceptions/http-exception.filter';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  /* /etag
+  app.getHttpAdapter().getInstance().set('etag', false);
+   */
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true, // DTO에 없은 속성은 무조건 거른다.
