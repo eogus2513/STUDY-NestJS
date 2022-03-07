@@ -19,7 +19,7 @@ export class EventGateway
 {
   @WebSocketServer() server: Server;
 
-  private logger = new Logger('socket.io');
+  private logger = new Logger('Socket');
 
   @SubscribeMessage('events')
   handleEvent(@MessageBody() data: string): string {
