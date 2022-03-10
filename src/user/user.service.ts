@@ -1,24 +1,30 @@
 import {
   BadRequestException,
+  CACHE_MANAGER,
+  Inject,
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { SignUpRequest } from './dto/request/SignUp.request';
-import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entity/user.entity';
-import { Repository } from 'typeorm';
 import { SignInRequest } from './dto/request/SignIn.request';
-import { TokenResponse } from './dto/response/Token.response';
 import { AuthService } from '../auth/auth.service';
 import { compare, hash } from 'bcryptjs';
+import { UserRepository } from './entity/repository/user.repository';
+import { TokenResponse } from '../auth/dto/response/token.response';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(User) private userRepository: Repository<User>,
+    private userRepository: UserRepository,
     private readonly authService: AuthService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
+
+  private readonly accessExp: number = 60 * 60 * 2;
+  private readonly refreshExp: number = 60 * 60 * 24 * 15;
 
   public async currentUser(user): Promise<User> {
     return user;
@@ -46,8 +52,22 @@ export class UserService {
       throw new BadRequestException();
     }
 
+    const access_token: string = this.authService.generateToken(
+      id,
+      'access',
+      this.accessExp,
+    );
+    const refresh_token: string = this.authService.generateToken(
+      id,
+      'refresh',
+      this.refreshExp,
+    );
+
+    await this.cacheManager.set(id, refresh_token, { ttl: 500 });
+
     return {
-      access_token: await this.authService.generateToken(id),
+      access_token,
+      refresh_token,
     };
   }
 
