@@ -20,6 +20,7 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
         entities: [User],
         synchronize: false,
         logging: false,
+        cache: true,
       }),
     }),
   ],
