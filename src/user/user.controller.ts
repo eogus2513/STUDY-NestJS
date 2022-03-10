@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Headers,
   HttpCode,
   Post,
   UseGuards,
@@ -33,5 +34,12 @@ export class UserController {
   @Post('login')
   public async login(@Body() body: SignInRequest): Promise<TokenResponse> {
     return await this.userService.login(body);
+  }
+
+  @Post('refresh')
+  public async userTokenRefresh(
+    @Headers('refresh-Token') token: string,
+  ): Promise<TokenResponse> {
+    return await this.userService.userTokenRefresh(token);
   }
 }

@@ -52,26 +52,54 @@ export class UserService {
       throw new BadRequestException();
     }
 
-    const access_token: string = this.authService.generateToken(
-      id,
-      'access',
-      this.accessExp,
-    );
-    const refresh_token: string = this.authService.generateToken(
-      id,
-      'refresh',
-      this.refreshExp,
-    );
+    const token = await this.generateToken(id);
 
-    await this.cacheManager.set(id, refresh_token, { ttl: 500 });
+    await this.cacheManager.set(token.refresh_token, token.refresh_token, {
+      ttl: 500,
+    });
 
     return {
-      access_token,
-      refresh_token,
+      access_token: token.access_token,
+      refresh_token: token.refresh_token,
     };
   }
 
   public async findOne(id: string) {
     return await this.userRepository.findOne({ id });
+  }
+
+  public async userTokenRefresh(token: string): Promise<TokenResponse> {
+    const refreshToken: string = await this.cacheManager.get(token);
+
+    if (!refreshToken) {
+      throw new NotFoundException('Token Not Found');
+    }
+
+    const verifyToken = await this.authService.httpVerify(refreshToken);
+
+    const generateToken = await this.generateToken(verifyToken.id);
+
+    return {
+      access_token: generateToken.access_token,
+      refresh_token: generateToken.refresh_token,
+    };
+  }
+
+  private async generateToken(id: string): Promise<TokenResponse> {
+    const access_token = this.authService.generateToken(
+      id,
+      'access',
+      this.accessExp,
+    );
+    const refresh_token = this.authService.generateToken(
+      id,
+      'refresh',
+      this.refreshExp,
+    );
+
+    return {
+      access_token,
+      refresh_token,
+    };
   }
 }
