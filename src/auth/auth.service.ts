@@ -6,15 +6,16 @@ import { WsException } from '@nestjs/websockets';
 export class AuthService {
   constructor(private readonly jwtService: JwtService) {}
 
-  public async generateToken(id: string): Promise<string> {
-    return await this.jwtService.signAsync(
+  public generateToken(id: string, type: string, exp: number): string {
+    return this.jwtService.sign(
       {
         sub: `${id}`,
+        type,
       },
       {
         secret: process.env.ACCESS_JWT,
         algorithm: 'HS256',
-        expiresIn: '2h',
+        expiresIn: exp,
       },
     );
   }
