@@ -8,11 +8,11 @@ import {
 } from '@nestjs/common';
 import { SignUpRequest } from './dto/request/SignUp.request';
 import { SignInRequest } from './dto/request/SignIn.request';
-import { TokenResponse } from './dto/response/Token.response';
 import { UserService } from './user.service';
 import { User } from './entity/user.entity';
 import { JwtAuthGuard } from '../auth/jwt/jwt.guard';
 import { CurrentUser } from '../common/decorators/user.decorator';
+import { TokenResponse } from '../auth/dto/response/token.response';
 
 @Controller('user')
 export class UserController {
