@@ -23,9 +23,6 @@ export class UserService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
-  private readonly accessExp: number = 60 * 60 * 2;
-  private readonly refreshExp: number = 60 * 60 * 24 * 15;
-
   public async currentUser(user): Promise<User> {
     return user;
   }
@@ -86,15 +83,17 @@ export class UserService {
   }
 
   private async generateToken(id: string): Promise<TokenResponse> {
+    const accessExp: number = 60 * 60 * 2;
+    const refreshExp: number = 60 * 60 * 24 * 15;
     const access_token = this.authService.generateToken(
       id,
       'access',
-      this.accessExp,
+      accessExp,
     );
     const refresh_token = this.authService.generateToken(
       id,
       'refresh',
-      this.refreshExp,
+      refreshExp,
     );
 
     return {
