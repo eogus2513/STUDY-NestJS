@@ -18,8 +18,7 @@ export class EventGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
   @WebSocketServer() server: Server;
-
-  private logger = new Logger('Socket');
+  private logger: Logger = new Logger('EventsGateway');
 
   @SubscribeMessage('events')
   handleEvent(@MessageBody() data: string): string {
