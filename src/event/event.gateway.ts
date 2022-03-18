@@ -9,16 +9,14 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { Logger, UseGuards } from '@nestjs/common';
-import { WsJwtGuard } from '../auth/jwt/ws.guard';
+import { Logger } from '@nestjs/common';
 
-@WebSocketGateway(3001, { namespace: 'socket.io' })
-@UseGuards(WsJwtGuard)
+@WebSocketGateway()
 export class EventGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
   @WebSocketServer() server: Server;
-  private logger: Logger = new Logger('EventsGateway');
+  private logger: Logger = new Logger('EventGateway');
 
   @SubscribeMessage('events')
   handleEvent(@MessageBody() data: string): string {
@@ -29,11 +27,11 @@ export class EventGateway
     this.logger.log('init');
   }
 
-  public async handleConnection(socket: Socket) {
+  public handleConnection(socket: Socket) {
     this.logger.log(`Client Connected : ${socket.id}`);
   }
 
-  handleDisconnect(@ConnectedSocket() socket: Socket) {
+  public handleDisconnect(@ConnectedSocket() socket: Socket) {
     this.logger.log(`Client DisConnected : ${socket.id}`);
   }
 }
