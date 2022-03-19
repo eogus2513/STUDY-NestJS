@@ -5,7 +5,7 @@ import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
-    PassportModule.register({ defaultStrategy: 'jwt', session: false }),
+    PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({}),
   ],
   providers: [AuthService],
