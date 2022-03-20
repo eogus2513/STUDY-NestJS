@@ -56,7 +56,7 @@ export class UserService {
     const token = await this.generateToken(id);
 
     await this.cacheManager.set(user.id, token.refresh_token, {
-      ttl: 1209600,
+      ttl: this.refreshExp,
     });
 
     return {
