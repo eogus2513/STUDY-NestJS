@@ -38,7 +38,7 @@ export class AuthService {
         ignoreExpiration: false,
       });
     } catch (e) {
-      throw new WsException(e);
+      throw new WsException(e.message);
     }
   }
 }
