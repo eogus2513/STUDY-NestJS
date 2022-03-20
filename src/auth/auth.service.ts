@@ -20,9 +20,9 @@ export class AuthService {
     );
   }
 
-  public async httpVerify(token: string): Promise<any> {
+  public httpVerify(token: string) {
     try {
-      return await this.jwtService.verifyAsync(token.split(' ')[1], {
+      return this.jwtService.verify(token.split(' ')[1], {
         secret: process.env.ACCESS_JWT,
         ignoreExpiration: false,
       });
@@ -31,9 +31,9 @@ export class AuthService {
     }
   }
 
-  public async wsVerify(token: string): Promise<any> {
+  public wsVerify(token: string): Promise<any> {
     try {
-      return await this.jwtService.verifyAsync(token.split('')[1], {
+      return this.jwtService.verify(token.split('')[1], {
         secret: process.env.ACCESS_JWT,
         ignoreExpiration: false,
       });
