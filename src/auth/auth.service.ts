@@ -6,7 +6,9 @@ import { WsException } from '@nestjs/websockets';
 export class AuthService {
   constructor(private readonly jwtService: JwtService) {}
 
-  public generateToken(id: string, type: string, exp: number): string {
+  public generateToken(id: string, type: string): string {
+    const accessExp: number = 60 * 60 * 2;
+    const refreshExp: number = 60 * 60 * 24 * 15;
     return this.jwtService.sign(
       {
         sub: `${id}`,
@@ -15,7 +17,7 @@ export class AuthService {
       {
         secret: process.env.ACCESS_JWT,
         algorithm: 'HS256',
-        expiresIn: exp,
+        expiresIn: type == 'access' ? accessExp : refreshExp,
       },
     );
   }
