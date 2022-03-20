@@ -36,9 +36,10 @@ export class UserController {
     return await this.userService.login(body);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('refresh')
   public async userTokenRefresh(
-    @Headers('refresh-Token') token: string,
+    @Headers('Refresh-Token') token: string,
   ): Promise<TokenResponse> {
     return await this.userService.userTokenRefresh(token);
   }
