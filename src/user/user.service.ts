@@ -14,6 +14,7 @@ import { compare, hash } from 'bcryptjs';
 import { UserRepository } from './entity/repository/user.repository';
 import { TokenResponse } from '../auth/dto/response/token.response';
 import { Cache } from 'cache-manager';
+import { Payload } from '../auth/jwt/jwt.payload';
 
 @Injectable()
 export class UserService {
@@ -22,6 +23,9 @@ export class UserService {
     private readonly authService: AuthService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
+
+  private readonly accessExp: number = 60 * 60 * 2;
+  private readonly refreshExp: number = 60 * 60 * 24 * 15;
 
   public async currentUser(user): Promise<User> {
     return user;
@@ -51,8 +55,8 @@ export class UserService {
 
     const token = await this.generateToken(id);
 
-    await this.cacheManager.set(token.refresh_token, token.refresh_token, {
-      ttl: 500,
+    await this.cacheManager.set(user.id, token.refresh_token, {
+      ttl: 1209600,
     });
 
     return {
@@ -66,15 +70,13 @@ export class UserService {
   }
 
   public async userTokenRefresh(token: string): Promise<TokenResponse> {
-    const refreshToken: string = await this.cacheManager.get(token);
+    const verifyToken: Payload = await this.verifyToken(token);
 
-    if (!refreshToken) {
-      throw new NotFoundException('Token Not Found');
-    }
+    const generateToken = await this.generateToken(verifyToken.sub);
 
-    const verifyToken = await this.authService.httpVerify(refreshToken);
-
-    const generateToken = await this.generateToken(verifyToken.id);
+    await this.cacheManager.set(verifyToken.sub, generateToken.refresh_token, {
+      ttl: 1209600,
+    });
 
     return {
       access_token: generateToken.access_token,
@@ -82,18 +84,24 @@ export class UserService {
     };
   }
 
+  private async verifyToken(token: string) {
+    const verifyToken: Payload = await this.authService.httpVerify(token);
+    if (!(await this.cacheManager.get(verifyToken.sub))) {
+      throw new UnauthorizedException('Invalid Token');
+    }
+    return verifyToken;
+  }
+
   private async generateToken(id: string): Promise<TokenResponse> {
-    const accessExp: number = 60 * 60 * 2;
-    const refreshExp: number = 60 * 60 * 24 * 15;
     const access_token = this.authService.generateToken(
       id,
       'access',
-      accessExp,
+      this.accessExp,
     );
     const refresh_token = this.authService.generateToken(
       id,
       'refresh',
-      refreshExp,
+      this.refreshExp,
     );
 
     return {
