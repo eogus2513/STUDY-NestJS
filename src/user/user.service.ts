@@ -24,6 +24,8 @@ export class UserService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
+  private readonly refreshExp: number = 60 * 60 * 24 * 15;
+
   public async currentUser(user): Promise<User> {
     return user;
   }
@@ -52,9 +54,8 @@ export class UserService {
 
     const token = await this.generateToken(id);
 
-    const refreshExp: number = 60 * 60 * 24 * 15;
     await this.cacheManager.set(user.id, token.refresh_token, {
-      ttl: refreshExp,
+      ttl: this.refreshExp,
     });
 
     return {
@@ -73,7 +74,7 @@ export class UserService {
     const generateToken = await this.generateToken(verifyToken.sub);
 
     await this.cacheManager.set(verifyToken.sub, generateToken.refresh_token, {
-      ttl: 1209600,
+      ttl: this.refreshExp,
     });
 
     return {
