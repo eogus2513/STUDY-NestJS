@@ -1,6 +1,5 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { WsException } from '@nestjs/websockets';
 
 @Injectable()
 export class AuthService {
@@ -22,7 +21,7 @@ export class AuthService {
     );
   }
 
-  public httpVerify(token: string) {
+  public Verify(token: string) {
     try {
       return this.jwtService.verify(token.split(' ')[1], {
         secret: process.env.ACCESS_JWT,
@@ -30,17 +29,6 @@ export class AuthService {
       });
     } catch (e) {
       throw new UnauthorizedException(e.message);
-    }
-  }
-
-  public wsVerify(token: string): Promise<any> {
-    try {
-      return this.jwtService.verify(token.split('')[1], {
-        secret: process.env.ACCESS_JWT,
-        ignoreExpiration: false,
-      });
-    } catch (e) {
-      throw new WsException(e.message);
     }
   }
 }
