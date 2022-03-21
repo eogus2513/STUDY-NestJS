@@ -44,10 +44,10 @@ export class UserService {
     const user: User = await this.findOne(id);
 
     if (!user) {
-      throw new NotFoundException();
+      throw new NotFoundException('User Not Found');
     }
     if (!(await compare(password, user.password))) {
-      throw new BadRequestException();
+      throw new BadRequestException('Password MisMatch');
     }
 
     const token = await this.generateToken(id);
@@ -83,7 +83,11 @@ export class UserService {
   }
 
   private async verifyToken(token: string) {
-    const verifyToken: Payload = await this.authService.httpVerify(token);
+    const verifyToken: Payload = await this.authService.Verify(token);
+    if (verifyToken.type !== 'refresh') {
+      throw new UnauthorizedException('Invalid Token Type');
+    }
+
     if (!(await this.cacheManager.get(verifyToken.sub))) {
       throw new UnauthorizedException('Invalid Token');
     }
